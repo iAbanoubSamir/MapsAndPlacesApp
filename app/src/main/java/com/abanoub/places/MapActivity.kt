@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import java.io.IOException
 
 class MapActivity : AppCompatActivity() {
@@ -52,6 +54,12 @@ class MapActivity : AppCompatActivity() {
             }
             return@setOnEditorActionListener false
         }
+
+        binding.locateMe.setOnClickListener {
+            getDeviceLocation()
+        }
+
+        hideSoftKeyboard()
     }
 
     private fun geolocate() {
@@ -69,7 +77,13 @@ class MapActivity : AppCompatActivity() {
 
         if (addressesList.isNotEmpty()) {
             val address = addressesList[0]
-            Toast.makeText(this, address.toString(), Toast.LENGTH_LONG).show()
+//            Toast.makeText(this, address.toString(), Toast.LENGTH_LONG).show()
+
+            moveMapCamera(
+                LatLng(address.latitude, address.longitude),
+                DEFAULT_ZOOM,
+                address.getAddressLine(0)
+            )
         }
     }
 
@@ -85,7 +99,8 @@ class MapActivity : AppCompatActivity() {
                         val lastLocation = task.result
                         moveMapCamera(
                             LatLng(lastLocation.latitude, lastLocation.longitude),
-                            DEFAULT_ZOOM
+                            DEFAULT_ZOOM,
+                            "Current Location"
                         )
                     }
                 }
@@ -95,8 +110,17 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
-    private fun moveMapCamera(lng: LatLng, zoom: Float) {
+    private fun moveMapCamera(lng: LatLng, zoom: Float, title: String) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, zoom))
+
+        if (!title.equals("Current Location")) {
+            val markerOptions = MarkerOptions()
+                .position(lng)
+                .title(title)
+            mGoogleMap.addMarker(markerOptions)
+        }
+
+        hideSoftKeyboard()
     }
 
     private fun initMap() {
@@ -141,6 +165,10 @@ class MapActivity : AppCompatActivity() {
             )
         }
 
+    }
+
+    private fun hideSoftKeyboard() {
+        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
     }
 
     override fun onRequestPermissionsResult(
