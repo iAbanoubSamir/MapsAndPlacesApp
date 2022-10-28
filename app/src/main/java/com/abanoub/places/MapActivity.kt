@@ -2,9 +2,13 @@ package com.abanoub.places
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import java.io.IOException
 
 class MapActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMapBinding
@@ -34,6 +39,38 @@ class MapActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         getLocationPermission()
+    }
+
+    private fun init() {
+        binding.searchBox.editText?.setOnEditorActionListener { textView, actionId, keyEvent ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH
+                || actionId == EditorInfo.IME_ACTION_DONE
+                || keyEvent.action == KeyEvent.ACTION_DOWN
+                || keyEvent.action == KeyEvent.KEYCODE_ENTER
+            ) {
+                geolocate()
+            }
+            return@setOnEditorActionListener false
+        }
+    }
+
+    private fun geolocate() {
+        val searchQuery = binding.searchBox.editText?.text.toString()
+
+        val geoCoder = Geocoder(this)
+
+        var addressesList: List<Address> = ArrayList<Address>()
+
+        try {
+            addressesList = geoCoder.getFromLocationName(searchQuery, 1)
+        } catch (e: IOException) {
+            Log.d(TAG, "geolocate: ${e.message}")
+        }
+
+        if (addressesList.isNotEmpty()) {
+            val address = addressesList[0]
+            Toast.makeText(this, address.toString(), Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun getDeviceLocation() {
@@ -75,6 +112,8 @@ class MapActivity : AppCompatActivity() {
                 mGoogleMap.apply {
                     isMyLocationEnabled = true
                     uiSettings.isMyLocationButtonEnabled = false
+
+                    init()
                 }
             }
         }

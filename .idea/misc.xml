@@ -3,8 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/MapsandPlaces/app/src/main/res/drawable/white_border_background.xml" value="0.1435" />
         <entry key="..\:/AndroidStudioProjects/MapsandPlaces/app/src/main/res/layout/activity_main.xml" value="0.18645833333333334" />
-        <entry key="..\:/AndroidStudioProjects/MapsandPlaces/app/src/main/res/layout/activity_map.xml" value="0.18645833333333334" />
+        <entry key="..\:/AndroidStudioProjects/MapsandPlaces/app/src/main/res/layout/activity_map.xml" value="0.25" />
       </map>
     </option>
   </component>
