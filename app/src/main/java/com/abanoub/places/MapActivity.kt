@@ -23,6 +23,8 @@ class MapActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        getLocationPermission()
     }
 
     private fun getLocationPermission() {
@@ -66,13 +68,13 @@ class MapActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         isLocationPermissionGranted = false
 
-        when (requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            when (requestCode) {
+                LOCATION_PERMISSION_REQUEST_CODE -> {
                     isLocationPermissionGranted = true
+                    initMap()
                 }
             }
-
         }
     }
 }
